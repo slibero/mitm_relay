@@ -128,11 +128,15 @@ def main():
 	else:
 		print color("[!] Interception disabled! %s will run in monitoring mode only." % __prog_name__, 1)
 
+	
 	# If a script was specified, import it
 	if cfg.script:
 		try:
-			from imp import load_source
-			cfg.script_module = load_source(cfg.script.name, cfg.script.name)
+			import os
+			base=os.path.basename(cfg.script.name)
+			modname=os.path.splitext(base)[0]
+			cfg.script_module = __import__(modname)
+			print "Imported script"
 
 		except Exception as e:
 			print color("[!] %s" % str(e))
@@ -257,7 +261,7 @@ def do_relay_tcp(client_sock, server_sock, cfg):
 				data_out = proxify(data_out, cfg, client_peer, server_peer, to_server=True)
 				server_sock.send(data_out)
 
-		 	if server_sock in receiving:
+			if server_sock in receiving:
 				data_in = server_sock.recv(BUFSIZE)
 
 				if not len(data_in): # server closed connection
