@@ -98,18 +98,39 @@ def main():
 	relays = [item for sublist in cfg.relays for item in sublist]
 
 	cfg.relays = []
+	seen = set()
 	for r in relays:
 		r = r.split(':')
 
+		proto = ""
+		rhost = ""
+		lport = 0
+		rport = 0
+
 		try:
 			if len(r) == 3:
-				cfg.relays.append(('tcp', int(r[0]), r[1], int(r[2])))
+				#cfg.relays.append(('tcp', int(r[0]), r[1], int(r[2])))
+				proto = 'tcp'
+				lport = int(r[0])
+				rhost = r[1]
+				rport = int(r[2])
 			elif len(r) == 4 and r[0] in ['tcp', 'udp']:
-				cfg.relays.append((r[0], int(r[1]), r[2], int(r[3])))
+				#cfg.relays.append((r[0], int(r[1]), r[2], int(r[3])))
+				proto = r[0]
+				lport = int(r[1])
+				rhost = r[2]
+				rport = int(r[3])
 			else:
 				raise
 
-			if r[0] == 'udp' and cfg.listen.startswith('127.0.0'):
+			cfg.relays.append((proto, lport, rhost, rport))
+			t = (proto, lport)
+			if t not in seen:
+				seen.add(t)
+			else:
+				print color ("[!] Warning: duplicate relay listening port " + t[0] + ":" + str(t[1]), 1)
+
+			if proto == 'udp' and cfg.listen.startswith('127.0.0'):
 				print color("[!] In UDP, it's not recommended to bind to 127.0.0.1. If you see errors, try to bind to your LAN IP address instead.", 1)
 
 		except:
