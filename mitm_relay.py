@@ -128,7 +128,10 @@ def main():
 			if t not in seen:
 				seen.add(t)
 			else:
-				print color ("[!] Warning: duplicate relay listening port " + t[0] + ":" + str(t[1]), 1)
+				#In tests with portable Python for Windows we did not get an "Address already in use" error
+				#so we force it
+				print color ("[!] Duplicate relay listening port %s:%d" % (t[0], t[1]), 1)
+				raise
 
 			if proto == 'udp' and cfg.listen.startswith('127.0.0'):
 				print color("[!] In UDP, it's not recommended to bind to 127.0.0.1. If you see errors, try to bind to your LAN IP address instead.", 1)
