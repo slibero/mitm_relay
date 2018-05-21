@@ -414,6 +414,8 @@ def create_server(relay, cfg):
 		serv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 		serv.bind((cfg.listen, lport))
 
+		print '[+] Relay listening on %s %d -> %s:%d' % relay
+
 		thread = Thread(target=do_relay_udp, args=(serv, (rhost, rport), cfg))
 		thread.start()
 
